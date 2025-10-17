@@ -8,7 +8,7 @@ require_relative 'license/encryptor'
 require_relative 'license/boundary'
 
 module Gitlab
-  class License
+  class License # rubocop:disable Metrics/ClassLength
     class Error < StandardError; end
     class ImportError < Error; end
     class ValidationError < Error; end
@@ -79,7 +79,7 @@ module Gitlab
                   :activated_at, :restrictions, :cloud_licensing_enabled,
                   :offline_cloud_licensing_enabled, :auto_renew_enabled, :seat_reconciliation_enabled,
                   :operational_metrics_enabled, :generated_from_customers_dot,
-                  :generated_from_cancellation
+                  :generated_from_cancellation, :temporary_extension, :contract_overages_allowed
 
     alias_method :issued_at, :starts_at
     alias_method :issued_at=, :starts_at=
@@ -170,6 +170,10 @@ module Gitlab
       offline_cloud_licensing_enabled == true
     end
 
+    def contract_overages_allowed?
+      contract_overages_allowed == true
+    end
+
     def auto_renew?
       auto_renew_enabled == true
     end
@@ -196,6 +200,10 @@ module Gitlab
 
     def jh_team_license?
       licensee['Company'].to_s.match?(/GitLab/i) && licensee['Email'].to_s.end_with?('@jihulab.com')
+    end
+
+    def temporary_extension?
+      temporary_extension == true
     end
 
     def restricted?(key = nil)
@@ -230,9 +238,12 @@ module Gitlab
       hash['auto_renew_enabled'] = auto_renew?
       hash['seat_reconciliation_enabled'] = seat_reconciliation?
       hash['operational_metrics_enabled'] = operational_metrics?
+      hash['contract_overages_allowed'] = contract_overages_allowed?
 
       hash['generated_from_customers_dot'] = generated_from_customers_dot?
       hash['generated_from_cancellation'] = generated_from_cancellation?
+
+      hash['temporary_extension'] = temporary_extension?
 
       hash['restrictions'] = restrictions if restricted?
 
@@ -283,9 +294,12 @@ module Gitlab
         operational_metrics_enabled
         generated_from_customers_dot
         generated_from_cancellation
+        temporary_extension
       ].each do |attr_name|
         public_send("#{attr_name}=", attributes[attr_name] == true)
       end
+
+      @contract_overages_allowed = attributes['contract_overages_allowed'] != false
 
       restrictions = attributes['restrictions']
       if restrictions&.is_a?(Hash)
