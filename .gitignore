@@ -58,6 +58,5 @@ temp/
 output/
 license_key
 license_key.pub
-result.gitlab-license
 features.list
 .DS_Store
