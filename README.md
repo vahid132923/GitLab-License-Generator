@@ -1,8 +1,8 @@
 chmod +x src/scan.features.rb
-LICENSE_NAME="Tim Cook"
-LICENSE_COMPANY="Apple Computer, Inc."
-LICENSE_EMAIL="tcook@apple.com"
+LICENSE_NAME="exalab.co"
+LICENSE_COMPANY="exalab Computer, Inc."
+LICENSE_EMAIL="sre@exalab.co"
 LICENSE_PLAN="ultimate"
 LICENSE_USER_COUNT="2147483647"
-LICENSE_EXPIRE_YEAR="2500"
+LICENSE_EXPIRE_YEAR="5000"
 ./make.sh
